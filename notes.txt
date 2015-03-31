@@ -23,7 +23,7 @@ Look at page 38 of the Symfony book "Optional Step 3: Create the Template".
 To see changes on the production ("prod") environment:
 ----------------------------------------------------------------------
 php app/console --env=prod cache:clear
-php app/console cache clear (clears the dev env)
+php app/console cache:clear (clears the dev env)
 
 
 To create bundles using the Symfony console:
