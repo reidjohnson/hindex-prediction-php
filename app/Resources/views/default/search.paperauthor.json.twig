@@ -1,0 +1,11 @@
+{
+  "total": {{total}},
+  "items" : [
+  {% for entity in entities %}
+    {
+      "id": {{entity.id}}, "name": "{{entity.name}}", "paperCount": {{entity.paperCount}}, "paperStartYear": {{entity.paperStartYear}}, "hindex2009": {{ entity.hindex2009 }}, "hindex": {{ entity.hindex2012 }}
+    }
+      {% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]
+}

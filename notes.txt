@@ -1,0 +1,52 @@
+To run the app:
+----------------------------------------------------------------------
+php app/console server:run
+
+
+Running on dev vs. prod modes:
+----------------------------------------------------------------------
+1) http://127.0.0.1:8000/app_dev.php
+2) http://127.0.0.1:8000/app.php
+
+
+Symfony2 plugin for PhpStorm (really helpful!):
+----------------------------------------------------------------------
+http://goo.gl/KKdjSV
+http://symfony2-plugin.espend.de/
+
+
+For templating:
+----------------------------------------------------------------------
+Look at page 38 of the Symfony book "Optional Step 3: Create the Template".
+
+
+To see changes on the production ("prod") environment:
+----------------------------------------------------------------------
+php app/console --env=prod cache:clear
+php app/console cache clear (clears the dev env)
+
+
+To create bundles using the Symfony console:
+----------------------------------------------------------------------
+php app/console generate:bundle -> Follow the instructions.
+
+
+For the database, create a table named symfony (via SQL) and run:
+----------------------------------------------------------------------
+php app/console doctrine:schema:update --force
+
+
+Cheat Sheet
+----------------------------------------------------------------------
+http://www.symfony2cheatsheet.com/
+
+
+Doctrine data types for entity fields
+----------------------------------------------------------------------
+http://doctrine-dbal.readthedocs.org/en/latest/reference/types.html
+
+
+Memcache bundle:
+----------------------------------------------------------------------
+In composer.json, add to the "require" field: "leaseweb/memcache-bundle": "1.1.*@dev"
+Then run: php composer.phar update leaseweb/memcache-bundle

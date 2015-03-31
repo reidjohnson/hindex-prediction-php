@@ -1,0 +1,11 @@
+{
+  "total": {{total}},
+  "items" : [
+  {% for entity in entities %}
+    {
+      "id": {{entity.id}}, "title": "{{entity.title}}", "authors": "{{entity.authors}}", "affiliations": "{{entity.affiliations}}", "year": {{entity.year}}, "venue": "{{entity.venue}}", "refs": "{{ entity.refs }}", "abstract": "{{ entity.abstract }}"
+    }
+      {% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]
+}

@@ -1,0 +1,27 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+homepage:
+    path:      /
+    defaults:  { _controller: AppBundle:Default:index }
+
+search_author:
+    path:     /search/author
+    defaults: { _controller: AppBundle:Search:searchAjaxAuthor }
+
+search_paper:
+    path:     /search/paper
+    defaults: { _controller: AppBundle:Search:searchAjaxPaper }
+
+predict_homepage:
+    path:     /predict
+    defaults: { _controller: AppBundle:Predict:createPrediction }
+
+predict_author:
+    path:     /predict/author
+    defaults: { _controller: AppBundle:Predict:predictAuthor }
+
+predict_paper:
+    path:     /predict/paper
+    defaults: { _controller: AppBundle:Predict:predictPaper }

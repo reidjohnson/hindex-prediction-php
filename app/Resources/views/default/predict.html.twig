@@ -1,0 +1,594 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {% stylesheets
+    'assets/css/plugins/iCheck/custom.css'
+    'assets/css/plugins/steps/jquery.steps.css'
+    'assets/css/plugins/select2/select2.min.css'
+    %}
+    <link type="text/css" rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+    <br></<br/>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="text-center m-t-none m-b-sm">
+                <h1>Welcome to our web-based <a href="http://en.wikipedia.org/wiki/H-index" target="_blank"><i>h</i>-index</a> predictor!</h1>
+            </div>
+            <div class="text-center m-t-md m-b-sm">
+                <h3>On the left, predict authors' future <i>h</i>-indices. On the right, predict whether a paper will contribute to its authors' <i>h</i>-indices.</h3>
+            </div>
+        </div>
+        <div class="col-lg-12 col-lg-offset-1">
+        <div>
+            <div class="ibox">
+                <div class="ibox-content col-lg-5" style="padding-right: 5px;/* border-top-left-radius: 25px;*/">
+                    <form id="form_author" action="#" class="form-horizontal wizard clearfix">
+                    <div class="content">
+                        <fieldset class="body current">
+                            <div class="col-md-12">
+                                <div class="text-center m-b-md">
+                                    <h2 style="color: #428bca;">Author Details</h2>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Search Author(s) *</label>
+                                    <div class="col-xs-8">
+                                        <select class="js-author-data-ajax js-states author-search-1 form-control" multiple="multiple" name="authorSearch[]" id="authorSearch"></select>
+                                    </div>
+                                </div>
+                                <div class="text-center"><h4>OR</h4></div>
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Author <i>h</i>-index *</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" {#min="0"#} class="author-search-2 form-control required" name="authorHindex[]" id="authorHindex" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Total Publications *</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" {#min="0"#} class="author-search-2 form-control required" name="authorTotalPub[]" id="authorTotalPub" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Year of Initial Publication *</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" {#min="1900" max="{{ 'now'|date('Y') + 1}}"#} class="author-search-2 form-control required" name="authorFirstPub[]" id="authorFirstPub" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-t-md">
+                                    <div class="col-xs-12 text-center">
+                                        <button type="submit" class="btn btn-primary" id="predictAuthor">Predict</button>
+                                    </div>
+                                </div>
+
+                                <div class="m-t-md m-b-n" id="highcharts-container"></div>
+
+                                <!--<p>(*) Mandatory</p>-->
+                            </div>
+                        </fieldset>
+                    </div>
+                </form>
+            </div>
+
+            <div class="ibox-content col-lg-5" style="padding-left: 5px;/* border-top-right-radius: 25px;*/">
+                <form id="form_paper" action="#" class="form-horizontal wizard clearfix">
+                    <div class="content">
+                        <fieldset class="body current">
+                            <div class="col-md-12">
+
+                                <div class="text-center m-b-md">
+                                    <h2 style="color: #428bca;">Paper Details</h2>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Paper Title *</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control required" name="paperTitle" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Author(s) *</label>
+                                    <div class="col-xs-8">
+                                        <select class="js-author-data-ajax js-states form-control required" multiple="multiple" name="paperAuthors[]"></select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Year</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control" name="paperYear" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Intended Venue *</label>
+                                    <div class="col-xs-8">
+                                        <input type="text" class="form-control required" name="paperVenue" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Abstract *</label>
+                                    <div class="col-xs-8">
+                                        <textarea rows="5" class="form-control required" name="paperAbstract"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-t-md">
+                                    <div class="col-xs-12 text-center">
+                                        <button type="submit" class="btn btn-primary" id="predictPaper">Predict</button>
+                                    </div>
+                                </div>
+
+                                <div id="paperpred-container"></div>
+
+                            </div>
+                        </fieldset>
+                        <!--<fieldset>
+                            <h2>Terms and Conditions</h2>
+                            <p>All information contained on this website is copyright © University of Notre Dame and
+                            shall remain the property of said author. You are authorized to view, download, or
+                            distribute the material on the this website solely for your personal, noncommercial use if
+                            you include the following copyright notice: "Copyright © 2015, University of Notre. All
+                            rights reserved.". All rights not expressly granted herein are reserved. All entered data is
+                            property of the University of Notre Dame and may be used for research purposes.</p>
+                            <input id="acceptTerms" name="acceptTerms" type="checkbox" class="required" style="width: auto;">
+                            <label for="acceptTerms" style="vertical-align: middle;">I agree with the Terms and Conditions.</label>
+                        </fieldset>-->
+                        </div>
+                    </form>
+                </div>
+                <div class="ibox-content col-lg-10 clearfix m-t-none" style="padding-top: 0px; padding-bottom: 5px; margin-left: 5px;/* border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;*/">
+                    <strong>Note:</strong> All queries and models are based on data provided by <a href="http://arnetminer.org/" target="_blank">AMiner</a>.
+                    Read details of this work in our paper, "<a href="http://arxiv.org/abs/1412.4754" target="_blank">Will This Paper Increase Your <i>h</i>-index? Scientific Impact Prediction</a>".
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    {#'assets/js/plugins/steps/jquery.steps.min.js'#}
+    {#'assets/js/plugins/validate/additional-methods.js'#}
+    {#'assets/js/regression.min.js'#}
+    {#'assets/js/d3.min.js'#}
+    {#'assets/js/underscore.min.js'#}
+    {#'assets/js/learningjs/learningjs.min.js'#}
+    {% javascripts
+    'assets/js/plugins/validate/jquery.validate.min.js'
+    'assets/js/plugins/select2/select2.min.js'
+    'assets/js/highcharts.js'
+    'assets/js/highcharts-more.js'
+    'assets/js/exporting.js'
+    %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <script>
+        // Reference: https://github.com/rstaib/jquery-steps/wiki (lots of options to customize this form)
+        $(document).ready(function() {
+            $.validator.addMethod("paperAbstract1", function(value) {
+                return value != "";
+            }, 'Please enter the paper abstract.');
+
+            var author_form = $("#form_author");
+            author_form.validate({
+                ignore:  null,
+                errorPlacement: function (error, element)
+                {
+                    element.before(error);
+                },
+                rules: {
+                    authorSearch: {
+                        required: {
+                            depends: function (element) {
+                                if (($("#authorHindex").val().length == 0) && ($("#authorTotalPub").val().length == 0) && ($("#authorFirstPub").val().length == 0)) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        }
+                    },
+                    authorHindex: {
+                        required: {
+                            depends: function (element) {
+                                return $("#authorSearch").is(":empty");
+                            }
+                        }
+                    },
+                    authorTotalPub: {
+                        required: {
+                            depends: function (element) {
+                                return $("#authorSearch").is(":empty");
+                            }
+                        }
+                    },
+                    authorFirstPub: {
+                        required: {
+                            depends: function (element) {
+                                return $("#authorSearch").is(":empty");
+                            }
+                        }
+                    }
+                },
+                submitHandler: function(form) {
+                    var isValid = true;
+
+                    var hindex_count = 0;
+                    $("#authorHindex").each(function() {
+                        var array = $(this).val().match( /(?=\S)[^,]+?(?=\s*(,|$))/g );
+                        for (var val in array) {
+                            if (array[val] == "") {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else if (!(array[val] >>> 0 === parseFloat(array[val]))) {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else {
+                                $(this).removeClass('error');
+                                hindex_count += 1;
+                            }
+                        }
+                    });
+
+                    var total_pub_count = 0;
+                    $("#authorTotalPub").each(function() {
+                        var array = $(this).val().match( /(?=\S)[^,]+?(?=\s*(,|$))/g );
+                        for (var val in array) {
+                            if (array[val] == "") {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else if (!(array[val] >>> 0 === parseFloat(array[val]))) {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else {
+                                $(this).removeClass('error');
+                                total_pub_count += 1;
+                            }
+                        }
+                    });
+
+                    var first_pub_count = 0;
+                    $("#authorFirstPub").each(function() {
+                        var array = $(this).val().match( /(?=\S)[^,]+?(?=\s*(,|$))/g );
+                        for (var val in array) {
+                            var d = new Date();
+                            if (array[val] == "") {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else if (!(array[val] >>> 0 === parseFloat(array[val]))) {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else if (parseFloat(array[val]) < 1900 || parseFloat(array[val]) > (d.getFullYear()+1)) {
+                                $(this).addClass('error');
+                                isValid = false;
+                            } else {
+                                $(this).removeClass('error');
+                                first_pub_count += 1;
+                            }
+                        }
+                    });
+
+                    if (!((hindex_count === total_pub_count) && (total_pub_count === first_pub_count))) {
+                        $("#authorHindex").addClass('error');
+                        $("#authorTotalPub").addClass('error');
+                        $("#authorFirstPub").addClass('error');
+                        isValid = false;
+                    }
+
+                    if(isValid) {
+                        // Manually URL encode the form data to generate input arrays.
+                        var $inputs = $("#form_author :input");
+                        var values = {};
+                        $inputs.each(function() {
+                            if ($(this).val()) {
+                                values[this.name] = $(this).val().toString().match( /(?=\S)[^,]+?(?=\s*(,|$))/g );
+                            } else {
+                                values[this.name] = "";
+                            }
+                        });
+                        var out = [];
+                        for (key in values) {
+                            for (v in values[key]) {
+                                out.push(key + '=' + encodeURIComponent(values[key][v]));
+                            }
+                        }
+                        out = out.join('&');
+                        //console.log(out);
+
+                        $.ajax({
+                            url: "/predict/author", // secret sauce
+                            type: form.method,
+                            data: out,
+                            success: function (response) {
+                                // response is JSON of form {"key":{"name":"","prediction": [[x,y],...[x,y]]}}
+                                var obj = JSON.parse(response);
+
+                                drawPredictAuthor(obj);
+                            }
+                        });
+                    }
+                }
+            });
+
+            author_form.find(".author-search-2").on('change', function() {
+                // Update displayed data.
+                var author_selections = document.getElementById("form_author").getElementsByClassName("select2-selection__choice");
+                for (var i = 0; i < author_selections.length; i++) {
+                    author_selections[i].remove();
+                }
+                // Update select2 data.
+                var new_data = $.grep(author_form.find(".js-author-data-ajax").select2('data'), function (value) {
+                    return value['id'] = null;
+                });
+                author_form.find(".js-author-data-ajax").select2('data', new_data);
+            });
+
+            author_form.find(".js-author-data-ajax").select2().on('change', function() {
+                var author_data = $(this).select2('data');
+                if (author_data[0]) {
+                    var authorHindexAll = [];
+                    var authorTotalPubAll = [];
+                    var authorFirstPubAll = [];
+                    for (var i=0; i<author_data.length; i++) {
+                        authorHindexAll.push(author_data[i]['hindex']);
+                        authorTotalPubAll.push(author_data[i]['paperCount']);
+                        authorFirstPubAll.push(author_data[i]['paperStartYear']);
+                    }
+                    document.getElementById("authorHindex").value = authorHindexAll;
+                    document.getElementById("authorTotalPub").value = authorTotalPubAll;
+                    document.getElementById("authorFirstPub").value = authorFirstPubAll;
+                } else {
+                    document.getElementById("authorHindex").value = null;
+                    document.getElementById("authorTotalPub").value = null;
+                    document.getElementById("authorFirstPub").value = null;
+                }
+            });
+
+            var paper_form = $("#form_paper");
+            paper_form.validate({
+                ignore:  null,
+                errorPlacement: function (error, element)
+                {
+                    element.before(error);
+                },
+                rules: {
+                    paperTitle: {
+                        required: true
+                    },
+                    paperAuthors: {
+                        required: true
+                    },
+                    paperYear: {
+                        //required: true,
+                        digits: true
+                    },
+                    paperVenue: {
+                        required: true
+                    },
+                    paperAbstract: {
+                        "paperAbstract1": '',
+                        required: true
+                    }
+                },
+                submitHandler: function(form) {
+                    $.ajax({
+                        url: "/predict/paper", // secret sauce
+                        type: form.method,
+                        data: $(form).serialize(),
+                        success: function(response) {
+                            // response is JSON of form {"name": "name", "prediction": pred}
+                            var obj = JSON.parse(response);
+
+                            drawPredictPaper(obj);
+                        }
+                    });
+                }
+            });
+
+            $(".js-author-data-ajax").select2({
+                placeholder: "",
+                minimumInputLength: 1,
+                width : '100%',
+                ajax: {
+                    url: "/search/author",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                            limit: 10,
+                            page: params.page
+                        };
+                    },
+                    processResults: function (data) {
+                        // Parse the results into the format expected by Select2.
+                        // Since we are using custom formatting functions we do not need to alter the remote JSON data.
+                        return {
+                            results: data.items
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+                templateResult: formatAuthor,
+                templateSelection: formatAuthorSelection,
+                dropdownCssClass: "bigdrop" // apply css that makes the dropdown taller
+            });
+        });
+
+        function formatAuthor (author) {
+            if (author.loading) return author.id || author.text;
+
+            var markup = '<div class="clearfix">' +
+                    '<div clas="col-sm-10">' +
+                    '<div class="col-sm-8">' + author.name + '</div>' +
+                    '<div class="col-sm-4" style="color: #a94442; text-align: right; font-weight: 600;"><i>h</i>-index: ' + author.hindex + '</div>' +
+                    '</div>' +
+                    '</div>';
+
+            return markup;
+        }
+
+        function formatAuthorSelection (author) {
+            return author.name;
+        }
+
+        function drawPredictAuthor(json) {
+            var x_vals = [];
+            var y_vals = [];
+            var names = [];
+            for(var k in json) {
+                for (var val in json[k].prediction) {
+                    x_vals.push(json[k].prediction[val][0]);
+                    y_vals.push(json[k].prediction[val][1]);
+                    names.push(json[k].name);
+                }
+            }
+
+            var series = generateData(x_vals, y_vals, names);
+            function generateData(cats, points, names) {
+                var ret = {},
+                        ps = [],
+                        series = [],
+                        len = cats.length;
+
+                // Concatenate to get points.
+                for (var i = 0; i < len; i++) {
+                    ps[i] = {
+                        x: cats[i],
+                        y: points[i],
+                        n: names[i]
+                    };
+                }
+                names = [];
+                // Generate series and split points.
+                for (i = 0; i < len; i++) {
+                    var p = ps[i],
+                            sIndex = $.inArray(p.n, names);
+
+                    if (sIndex < 0) {
+                        sIndex = names.push(p.n) - 1;
+                        series.push({
+                            name: p.n,
+                            data: []
+                        });
+                    }
+                    series[sIndex].data.push(p);
+                }
+                return series;
+            }
+
+            $('#highcharts-container').highcharts({
+                chart: {
+                    plotBackgroundColor: '#FFFFFF',
+
+                    // Edit chart spacing.
+                    spacingBottom: 15,
+                    spacingTop: 10,
+                    spacingLeft: 10,
+                    spacingRight: 10,
+
+                    // Explicitly define the width and height of a chart.
+                    width: null,
+                    height: 350
+                },
+
+                title: {
+                    useHTML: false,
+                    text: '<div class="text-center"><h3>Author <i>h</i>-index Predictions</h3></div>',
+                    style: {
+                        color: '#676a6c',
+                        textAlign: 'center',
+                        fontFamily: 'open sans',
+                        fontSize: '16px',
+                        fontWeight: '500'
+                    }
+                },
+
+                xAxis: {
+                    type: 'integer',
+                    title: {
+                        text: 'Years Ahead'
+                    },
+                    min: 0,
+                    max: 10,
+                    minTickInterval: 1,
+                    startOnTick: true,
+                    endOnTick: true,
+                    labels: {
+                        style: {
+                            color: '#676a6c',
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            fontFamily: 'open sans'
+                        }
+                    }
+                },
+
+                yAxis: {
+                    type: 'integer',
+                    title: {
+                        text: 'Future <i>h</i>-index'
+                    },
+                    min: 0,
+                    tickInterval: 1,
+                    labels: {
+                        style: {
+                            color: '#676a6c',
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                            fontFamily: 'open sans'
+                        }
+                    }
+                },
+
+                tooltip: {
+                    crosshairs: true,
+                    shared: true,
+                    valueSuffix: '',
+                    formatter: function () {
+                        return 'Years Ahead: ' + this.x + '<br/><div style="color: #428bca; font-weight: 600;">h-index: ' + this.y + '</div>';
+                    }
+                },
+
+                legend: {
+                    enabled: true,
+                    align: 'left'
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                series: series
+            });
+        }
+
+        function drawPredictPaper(json) {
+            var html_string = " \
+            <div class=\"text-center m-t-md m-b-md\"> \
+                <h3 style=\"line-height: normal;\">Paper Contribution Predictions</h3> \
+                <h5>(The probability that the paper will contribute to the authors' <i>h</i>-indices within 5 years.)</h5> \
+            </div> \
+            <div class=\"text-left m-b-lg\">";
+            for(var k=0; k < json.length; k++) {
+                var name = json[k].name;
+                var pred = ((json[k].prediction * 100)).toFixed(3);
+                html_string += "<h4>Probability for " + name + ": <div style=\"color: #428bca; font-weight: 600; display: inline;\">" + pred + "%</div></h4>";
+            }
+            html_string += "</div>";
+
+            $('#paperpred-container').html(html_string);
+        };
+
+    </script>
+{% endblock %}
