@@ -6,3 +6,5 @@
 
 This tool allows users to generate predictions of authors' future h-indices 
 and to predict whether a paper will contribute to its authors' h-indices.
+
+The project is developed in PHP and uses the Symfony framework (v2.6).
