@@ -24,7 +24,7 @@
         <div class="col-lg-12 col-lg-offset-1">
         <div>
             <div class="ibox">
-                <div class="ibox-content col-lg-5" style="padding-right: 5px;/* border-top-left-radius: 25px;*/">
+                <div class="ibox-content col-lg-5">
                     <form id="form_author" action="#" class="form-horizontal wizard clearfix">
                     <div class="content">
                         <fieldset class="body current">
@@ -73,7 +73,7 @@
                 </form>
             </div>
 
-            <div class="ibox-content col-lg-5" style="padding-left: 5px;/* border-top-right-radius: 25px;*/">
+            <div class="ibox-content col-lg-5">
                 <form id="form_paper" action="#" class="form-horizontal wizard clearfix">
                     <div class="content">
                         <fieldset class="body current">
@@ -141,7 +141,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="ibox-content col-lg-10 clearfix m-t-none" style="padding-top: 0px; padding-bottom: 5px; margin-left: 5px;/* border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;*/">
+                <div class="ibox-content col-lg-10 clearfix m-t-none" style="min-height: 80px; padding-top: 0px; padding-bottom: 5px; margin-left: 5px;/* border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;*/">
                     <strong>Note:</strong> All queries and models are based on data provided by <a href="http://arnetminer.org/" target="_blank">AMiner</a>.
                     Read details of this work in our paper, "<a href="http://arxiv.org/abs/1412.4754" target="_blank">Will This Paper Increase Your <i>h</i>-index? Scientific Impact Prediction</a>".
                 </div>
@@ -427,10 +427,8 @@
             if (author.loading) return author.id || author.text;
 
             var markup = '<div class="clearfix">' +
-                    '<div clas="col-sm-10">' +
-                    '<div class="col-sm-8">' + author.name + '</div>' +
-                    '<div class="col-sm-4" style="color: #a94442; text-align: right; font-weight: 600;"><i>h</i>-index: ' + author.hindex + '</div>' +
-                    '</div>' +
+                    '<div style="display: inline;">' + author.name + '</div>' +
+                    '<div class="pull-right" style="color: #a94442; font-weight: 600;"><i>h</i>-index: ' + author.hindex + '</div>' +
                     '</div>';
 
             return markup;

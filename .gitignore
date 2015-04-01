@@ -9,6 +9,9 @@
 /build/
 /vendor/
 /bin/
+
+/app/hindex_pred.db
+/app/hindex_pred.db-journal
 /web/assets/css/unused
 /web/assets/js/unused
 /composer.phar

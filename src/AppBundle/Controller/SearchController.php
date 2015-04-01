@@ -54,6 +54,11 @@ class SearchController extends Controller {
 
         $rep = $em->getRepository('AppBundle:AMinerPaperAuthor');
 
+        //$count = $em ->createQuery('SELECT COUNT(a.id) FROM AppBundle:AMinerPaperAuthor a')
+        //    ->getSingleScalarResult();
+        //dump($count);
+        //dump(count);
+
         if ($term) {
             $entities = $rep->createQueryBuilder('m')
                 ->where('m.name LIKE ?1')

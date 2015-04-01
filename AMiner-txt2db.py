@@ -1,11 +1,12 @@
 import codecs
+import sqlite3
 import sys
 
 import MySQLdb
 
 # =============================================================================
 def Usage():
-    print('Usage: AMiner-txt2db.py password')
+    print('Usage: AMiner-txt2db.py rdbms password')
     print('')
     sys.exit( 1 )
 # =============================================================================
@@ -17,18 +18,20 @@ class Database():
     host = 'localhost'
     user = 'root'
     password = ''
-    db = 'hindex_pred'
+    #db = 'hindex_pred'
+    db ='app/hindex_pred.db'
     charset = 'utf8'
     use_unicode = True
 
     def __init__(self, password):
         self.password = password
-        self.connection = MySQLdb.connect(self.host, 
-                                          self.user, 
-                                          self.password, 
-                                          self.db,
-                                          charset=self.charset,
-                                          use_unicode=self.use_unicode)
+        self.connection = sqlite3.connect(#self.host, 
+                                          #self.user, 
+                                          #self.password, 
+                                          self.db#,
+                                          #charset=self.charset,
+                                          #use_unicode=self.use_unicode
+                                          )
         self.cursor = self.connection.cursor()
 
     def insert(self, query, list):
@@ -172,6 +175,10 @@ def LoadAMinerAuthor(db):
 def LoadAMinerPaperAuthor(db):
     count = 0
     
+    table_name = 'aminer_paper_author'
+    
+    db.connection.text_factory = str
+    
     # Data stored as collected in 2012
     with open('weka-2012-1-hindex.csv', 'r') as f:
         next(f) # skip header
@@ -183,7 +190,7 @@ def LoadAMinerPaperAuthor(db):
             author = {}
 
             #name
-            author['name'] = str(line[0])
+            author['name'] = sqlite3.Binary(str(line[0]))
 
             # number of publications
             sqrt_pubs = float(line[1]) # stored as the sqrt number of publications
@@ -198,11 +205,11 @@ def LoadAMinerPaperAuthor(db):
             # h-index three years ago
             author['hindex2009'] = int(line[4])
 
-            print '\n', author, '\n'
+            #print '\n', author, '\n'
 
             # Data Insert into the table
             columns = ', '.join(author.keys())
-            format = ', '.join(['%s'] * len(author))
+            format = ', '.join(['?'] * len(author))
             query = "INSERT INTO aminer_paper_author (%s) VALUES (%s)" % (columns, format)
 
             try:
