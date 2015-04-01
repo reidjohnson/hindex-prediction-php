@@ -2,11 +2,11 @@ import codecs
 import sqlite3
 import sys
 
-import MySQLdb
+#import MySQLdb
 
 # =============================================================================
 def Usage():
-    print('Usage: AMiner-txt2db.py rdbms password')
+    print('Usage: AMiner-txt2db.py password')
     print('')
     sys.exit( 1 )
 # =============================================================================
@@ -18,20 +18,20 @@ class Database():
     host = 'localhost'
     user = 'root'
     password = ''
-    #db = 'hindex_pred'
-    db ='app/hindex_pred.db'
     charset = 'utf8'
     use_unicode = True
+    
+    # For MySQL.
+    #db = 'hindex_pred'
+    #params = self.host, self.user, self.password, self.db, charset=self.charset, use_unicode=self.use_unicode
+    
+    # For SQLite.
+    db ='app/hindex_pred.db'
+    params = self.db
 
     def __init__(self, password):
         self.password = password
-        self.connection = sqlite3.connect(#self.host, 
-                                          #self.user, 
-                                          #self.password, 
-                                          self.db#,
-                                          #charset=self.charset,
-                                          #use_unicode=self.use_unicode
-                                          )
+        self.connection = sqlite3.connect(params)
         self.cursor = self.connection.cursor()
 
     def insert(self, query, list):
@@ -174,11 +174,9 @@ def LoadAMinerAuthor(db):
 
 def LoadAMinerPaperAuthor(db):
     count = 0
-    
-    table_name = 'aminer_paper_author'
-    
-    db.connection.text_factory = str
-    
+
+    db.connection.text_factory = str # for SQLite
+
     # Data stored as collected in 2012
     with open('weka-2012-1-hindex.csv', 'r') as f:
         next(f) # skip header
@@ -190,7 +188,8 @@ def LoadAMinerPaperAuthor(db):
             author = {}
 
             #name
-            author['name'] = sqlite3.Binary(str(line[0]))
+            #author['name'] = str(line[0])
+            author['name'] = sqlite3.Binary(str(line[0])) # for SQLite
 
             # number of publications
             sqrt_pubs = float(line[1]) # stored as the sqrt number of publications
@@ -239,5 +238,5 @@ if __name__ == "__main__":
 
     #LoadAMinerPaper(db)
     #LoadAMinerAuthor(db)
-    LoadAMinerPaperAuthor(db)
+    #LoadAMinerPaperAuthor(db)
     #LoadAMinerVenue(db)
